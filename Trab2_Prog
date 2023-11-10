@@ -48,6 +48,41 @@ void busca_insere(int ident, char* title, char* author, int ano, int quantidade,
         p->prox = nova;
     }
 }
+Exemplar* emprestar_Livro(Livro* listaLivros, Exemplar* listaEmprestados, int idLivro, int rga) {
+    Livro* aux = listaLivros;
+    while(aux->id != idLivro && aux->prox){
+        aux = aux->prox;
+    }
+    if(aux &&  aux->qtdisponivel > 0){
+        aux->qtdisponivel -= 1;
+        Exemplar* novoExemplar = malloc(sizeof(Exemplar));
+        if (!novoExemplar) {
+            printf("Erro ao alocar memória para o novo exemplar\n");
+            exit(EXIT_FAILURE);
+        }
+
+        novoExemplar->id = idLivro;
+        novoExemplar->RGA = RGA;
+        strcpy(novoExemplar->titulo, aux->titulo);
+        strcpy(novoExemplar->autor, aux->autor);
+
+
+        novoExemplar->prox = listaEmprestados;
+
+        listaEmprestados = novoExemplar;
+    } else {
+        printf("Livro Não Existente ou Indisponível\n");
+    }
+
+    return listaEmprestados;
+}
+Exemplar* devolucao_Livro(Exemplar* listaEmprestados, int idLivro){
+    
+    
+};
+
+
+
 
 void imprimir_livro(Livro *lst){
     Livro *p;
@@ -55,21 +90,28 @@ void imprimir_livro(Livro *lst){
     for (p = lst; p != NULL; p = p->prox)
         printf("%d \"%s\" \"%s\" %d %d\n", p->id, p->titulo, p->autor, p->anoPublicacao, p->qtdade);
 }
+imprimirLivrosEmprestimo()
 
 
 int main(void) {
-    Livro *Livros;
+    Livro* Livros;
     Livros = (Livro *) malloc(sizeof (Livro));
     Livros->prox = NULL;
-
     Livro book;
-    Exemplar Emprestimo;
+    
+    Exemplar* Emprestimo;
+    Emprestimo = (Exemplar *) malloc(sizeof (Exemplar));
+    Emprestimo->prox = NULL;
 
     char comand;
 
-    scanf(" %c", &comand);  // Espaço antes do %c para ignorar espaços em branco
+     // Espaço antes do %c para ignorar espaços em branco
 
-    while (comand != 'S') {
+    
+    do{
+        printf("\n\tA - Adicionar um livro à biblioteca\n\tR - Remover um exemplar de livro da biblioteca\n\tP - Imprimir a lista de livros na biblioteca\n\tE - Empréstimo de um exemplar\n\tD - Devolução de um exemplar\n\tI - Imprimir a lista de livros da biblioteca que estão emprestados\n\tS - Sair do programa\n\t");
+        printf("\n\t");
+        scanf(" %c", &comand); 
         switch (comand) {
             case 'A':
                 scanf("%d \"%99[^\"]\" \"%49[^\"]\" %d %d\n", &book.id, book.titulo, book.autor, &book.anoPublicacao, &book.qtdade);
@@ -79,10 +121,24 @@ int main(void) {
             case 'P':
                 imprimir_livro(Livros->prox);
                 break;
+            case 'E': {
+                int idLivro, RGA;
+                scanf("%d %d", &idLV, &RGA);
+                Emprestimo = emprestar_Livro(Livros, Emprestimo, idLV, RGA);
+                break;
+            }
+            case 'D': {
+                int idLivro;
+                scanf("%d", &idLivro);
+                Emprestimo = devolucao_Livro(Emprestimo, idLivro);
+                break;
+            }
+            case 'I':
+                imprimirLivrosEmprestimo(Emprestimo);
+                break;
         }
-
-        scanf(" %c", &comand);  // Espaço antes do %c para ignorar espaços em branco
-    }
+    }while(comand != 'S');
+    
 
     return 0;
 }
